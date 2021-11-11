@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<dbs>
+    <DataSourceParam>
+        <description>朝阳配网检修</description>
+        <url>jdbc:dm://127.0.0.1:12345/OMSPDJX?allowMultiQueries=true</url>
+        <database>OMSPDJX</database>
+        <username>OMSPDJXCY</username>
+        <password>OMSPDJXCY</password>
+        <schemaName>OMSPDJX_CY</schemaName>
+    </DataSourceParam>
+    <DataSourceParam>
+        <description>鞍山配网检修</description>
+        <url>jdbc:dm://127.0.0.1:12345/OMSPDJX?allowMultiQueries=true</url>
+        <database>OMSPDJX</database>
+        <username>OMSPDJXAS</username>
+        <password>OMSPDJXAS</password>
+        <schemaName>OMSPDJX_AS</schemaName>
+    </DataSourceParam>
+<DataSourceParam>
+    <description>通用配网检修</description>
+    <url>jdbc:dm://127.0.0.1:12345/OMSPDJX?allowMultiQueries=true</url>
+    <username>OMSPDJXTY</username>
+    <password>OMSPDJXTY</password>
+    <database>OMSPDJX</database>
+    <schemaName>OMSPDJX_TY</schemaName>
+  </DataSourceParam>
+<DataSourceParam>
+    <description>沈阳配网检修</description>
+    <url>jdbc:dm://127.0.0.1:12345/OMSPDJX?allowMultiQueries=true</url>
+    <username>OMSPDJXSY</username>
+    <password>OMSPDJXSY</password>
+    <database>OMSPDJX</database>
+    <schemaName>OMSPDJX_SY</schemaName>
+  </DataSourceParam>
+<DataSourceParam>
+    <description>朝阳服务器配网检修2.0</description>
+    <url>jdbc:dm://127.0.0.1:12345/OMSPDJX?allowMultiQueries=true</url>
+    <username>OMSPDJXYS</username>
+    <password>OMSPDJXYS</password>
+    <database>OMSPDJX</database>
+    <schemaName>OMSPDJX_YS</schemaName>
+  </DataSourceParam>
+</dbs>

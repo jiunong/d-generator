@@ -1,0 +1,20 @@
+
+server:
+  port: 9527
+  servlet:
+    context-path: /
+  tomcat:
+    max-connections: 10000
+    connection-timeout: 1000
+spring:
+  freemarker:
+    cache: false
+    allow-request-override: on
+    expose-session-attributes: on
+    request-context-attribute: request
+    check-template-location: true
+
+
+##自定义
+
+
