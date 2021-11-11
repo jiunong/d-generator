@@ -14,7 +14,6 @@ public interface ConstVal {
 
     String UTF8 = StandardCharsets.UTF_8.name();
 
-    String TEMPLATE_JSP_LIST = "/templates/list.jsp.ftlh";
 
 
 }
