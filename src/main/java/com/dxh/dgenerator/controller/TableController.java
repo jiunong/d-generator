@@ -133,6 +133,14 @@ public class TableController {
         return vo;
     }
 
+    /**
+    * TODO 测试用 找FEC665FD88的数据
+    * @param  
+    * @return com.dxh.dgenerator.models.ResultVO 
+    * @author xuhong.ding 
+    * @since 2021/11/18 13:40 
+    **/
+    
     @GetMapping("data/find")
     public ResultVO find() {
         List<String> list = ListUtil.list(false);
@@ -166,6 +174,15 @@ public class TableController {
     }
 
 
+    /**
+    * TODO 分页sql
+    * @param sql :
+    * @param page :
+    * @param showData :
+    * @return java.lang.String
+    * @author xuhong.ding
+    * @since 2021/11/18 13:40
+    **/
     private String pageDecorate(String sql, int page, int showData) {
         return "select * from (select *,rownum ind from (   "
                 .concat(sql)

@@ -44,31 +44,31 @@
                                 <td><label>URL</label></td>
                                 <td><label>
                                         <input name="url" type="text"
-                                               value="jdbc:dm://192.168.135.37:12345/OMSPDJX?allowMultiQueries=true">
+                                               value="">
                                     </label></td>
                             </tr>
                             <tr>
                                 <td><label>DATABASE</label></td>
                                 <td><label>
-                                        <input name="database" type="text" value="OMSPDJX">
+                                        <input name="database" type="text" value="">
                                     </label></td>
                             </tr>
                             <tr>
                                 <td><label>USERNAME</label></td>
                                 <td><label>
-                                        <input name="username" type="text" value="OMSPDJXSY">
+                                        <input name="username" type="text" value="">
                                     </label></td>
                             </tr>
                             <tr>
                                 <td><label>PASSWORD</label></td>
                                 <td><label>
-                                        <input name="password" type="text" value="OMSPDJXSY">
+                                        <input name="password" type="text" value="">
                                     </label></td>
                             </tr>
                             <tr>
                                 <td><label title="为唯一属性，列表存在则更新，否则新增">SCHEMA</label></td>
                                 <td><label>
-                                        <input name="schemaName" type="text" value="OMSPDJX_SY">
+                                        <input name="schemaName" type="text" value="">
                                     </label></td>
                             </tr>
                             <tr>
@@ -76,7 +76,9 @@
                                         <button id="_confirm" type="submit" class="but">确定连接<span></span></button>
                                     </label></td>
                                 <td><label>
+<#--
                                         <button id="_modify" onclick="modifyDb()" type="button" class="but">更新配置<span></span></button>
+-->
                                     </label></td>
                             </tr>
                             </tbody>

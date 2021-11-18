@@ -15,6 +15,7 @@ import org.xml.sax.SAXException;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.List;
 
@@ -36,17 +37,30 @@ public class DatabaseXmlService {
 
 
     private static final Resource resource = new ClassPathResource("database.xml");
-    private static final String DATABASE_XML_PATH = FileUtil.getWebRoot().getPath().concat(FileUtil.isWindows()
-            ? "\\src\\main\\resources\\database.xml"
-            : "/src/main/resources/database.xml");
 
-    public static List<DataSourceParam> getDBs() throws IOException {
+    private static final String DATABASE_XML_PATH = System.getProperty("user.dir")+"/conf/database.xml";
+
+    public static List<DataSourceParam> getDBs() {
 
         List<DataSourceParam> list = ListUtil.list(false);
-        Document document = XmlUtil.readXML(resource.getInputStream());
-        XmlUtil.getElements(XmlUtil.getRootElement(document), NODE_NAME).forEach(u -> {
-            list.add(XmlUtil.xmlToBean(u, DataSourceParam.class));
-        });
+        try {
+            Document document = XmlUtil.readXML(FileUtil.getInputStream(DATABASE_XML_PATH));
+            XmlUtil.getElements(XmlUtil.getRootElement(document), NODE_NAME).forEach(u -> {
+                list.add(XmlUtil.xmlToBean(u, DataSourceParam.class));
+            });
+        } catch (Exception e) {
+            DataSourceParam dataSourceParam = new DataSourceParam();
+            String s = "请检查" + DATABASE_XML_PATH + "文件是否存在";
+            dataSourceParam.setDescription(s);
+            dataSourceParam.setDriverName(s);
+            dataSourceParam.setUrl(s);
+            dataSourceParam.setDatabase(s);
+            dataSourceParam.setSchemaName(s);
+            dataSourceParam.setUsername(s);
+            dataSourceParam.setPassword(s);
+            list.add(dataSourceParam);
+        }
+
         return list;
     }
 
@@ -77,27 +91,6 @@ public class DatabaseXmlService {
         XmlUtil.appendChild(element, DATABASE).setTextContent(add.getDatabase());
         XmlUtil.appendChild(element, SCHEMA_NAME).setTextContent(add.getSchemaName());
 
- /*       Element description = document.createElement(DESCRIPTION);
-        description.setTextContent(add.getDescription());
-
-        Element url = document.createElement(URL);
-        url.setTextContent(add.getUrl());
-        Element password = document.createElement(PASSWORD);
-        password.setTextContent(add.getPassword());
-        Element username = document.createElement(USERNAME);
-        username.setTextContent(add.getUsername());
-        Element database = document.createElement(DATABASE);
-        database.setTextContent(add.getDatabase());
-        Element schemaName = document.createElement(SCHEMA_NAME);
-        schemaName.setTextContent(add.getSchemaName());
-        Node node = document.createElement(NODE_NAME)
-                .appendChild(description)
-                .appendChild(url)
-                .appendChild(database)
-                .appendChild(username)
-                .appendChild(password)
-                .appendChild(schemaName);
-        document.appendChild(node);*/
         XmlUtil.toFile(document, DATABASE_XML_PATH, ConstVal.UTF8);
     }
 
