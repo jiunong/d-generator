@@ -1,8 +1,11 @@
 package com.dxh.dgenerator.service;
 
+import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.map.MapUtil;
 import com.dxh.dgenerator.config.DataSourceConfig;
+import com.dxh.dgenerator.models.ExportTableModel;
 import com.dxh.dgenerator.models.ResultVO;
+import com.dxh.dgenerator.models.TableFiled;
 import com.dxh.dgenerator.models.TableInfo;
 import com.dxh.dgenerator.querys.DecoratorDbQuery;
 
@@ -28,7 +31,6 @@ public class TableService {
     /**
      * TODO   获取所有table
      *
-     * @param instance 数据库配置
      * @return java.util.List<com.dxh.dgenerator.models.TableInfo>
      * @author xuhong.ding
      * @since 2021/2/5 10:43
@@ -74,5 +76,46 @@ public class TableService {
         }
         return new ResultVO<>(dataList);
     }
+
+    public static List<TableFiled> getTableFiled(String tableId) {
+        dbQuery = new DecoratorDbQuery(instance);
+        List<TableFiled> tableFileds = new ArrayList<>();
+        try (PreparedStatement preparedStatement = dbQuery.getConnection().prepareStatement(dbQuery.tableFieldsSql())) {
+            preparedStatement.setString(1, tableId);
+            dbQuery.query(preparedStatement, u -> {
+                tableFileds.add(TableFiled.builder()
+                        .name(u.getStringResult("NAME"))
+                        .type(u.getStringResult("TYPE"))
+                        .length(u.getStringResult("LENGTH"))
+                        .nullAble(u.getStringResult("NULLABLE"))
+                        .comment(u.getStringResult("RESVD5"))
+                        .build());
+            });
+        } catch (SQLException sqlException) {
+            sqlException.printStackTrace();
+        }
+        return tableFileds;
+    }
+
+    public static List<ExportTableModel> getTableDataForDownload(String tableId){
+        List<ExportTableModel> list = ListUtil.list(false);
+        List<TableInfo> tables = getTables();
+        tables.forEach(u->{
+            List<TableFiled> tableFiled = getTableFiled(u.getTableId());
+            tableFiled.forEach(v->{
+                ExportTableModel eto = new ExportTableModel();
+                eto.setTableName(u.getTableName());
+                eto.setTableComment(u.getComment());
+                eto.setColumnName(v.getName());
+                eto.setColumnType(v.getType());
+                eto.setLength(v.getLength());
+                eto.setColumnComment(v.getComment());
+                eto.setNullAble(v.getNullAble());
+                list.add(eto);
+            });
+        });
+        return list;
+    }
+
 
 }

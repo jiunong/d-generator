@@ -47,6 +47,9 @@ button {
     position: fixed;
     width: 100vw;
 }
+.fixThead tr{
+    background-color:#a2afd8;
+}
 
 .tableFiled {
     position: fixed;

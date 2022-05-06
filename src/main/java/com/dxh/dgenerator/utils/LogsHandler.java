@@ -3,6 +3,7 @@ package com.dxh.dgenerator.utils;
 import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.io.FileUtil;
+import com.dxh.dgenerator.config.ConstVal;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.File;
@@ -23,6 +24,7 @@ public class LogsHandler {
     private static LogsHandler logsHandler;
 
     private HttpServletRequest httpServletRequest;
+
 
     private static final String logPath = FileUtil.getWebRoot().getPath().concat(FileUtil.isWindows() ? "\\logs\\db.out" : "/logs/db.out");
 

@@ -138,3 +138,6 @@ const sql = function () {
         content: '/sql'
     });
 }
+function exportDb() {
+    window.open('/data/export/text')
+}

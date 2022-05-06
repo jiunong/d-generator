@@ -10,7 +10,7 @@ import java.nio.charset.StandardCharsets;
  */
 public interface ConstVal {
 
-    String PROJECT_PATH = System.getProperty("user.dir").concat("/src/main/java/");
+    String PROJECT_PATH = System.getProperty("user.dir").concat("/");
 
     String UTF8 = StandardCharsets.UTF_8.name();
 

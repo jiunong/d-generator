@@ -1,7 +1,15 @@
 package com.dxh.dgenerator.controller;
 
 import cn.hutool.core.collection.ListUtil;
+import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.io.FileUtil;
+import com.alibaba.excel.EasyExcel;
+import com.alibaba.excel.write.merge.LoopMergeStrategy;
+import com.alibaba.excel.write.style.column.LongestMatchColumnWidthStyleStrategy;
+import com.dxh.dgenerator.config.ConstVal;
 import com.dxh.dgenerator.config.DataSourceConfig;
+import com.dxh.dgenerator.config.ExcelFillCellMergeStrategy;
+import com.dxh.dgenerator.models.ExportTableModel;
 import com.dxh.dgenerator.models.ResultCode;
 import com.dxh.dgenerator.models.ResultVO;
 import com.dxh.dgenerator.models.TableFiled;
@@ -12,6 +20,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -39,6 +51,7 @@ public class TableController {
     private final static String DELETE = "DELETE";
     private final static String INSERT = "INSERT";
     private final static String COUNT = "COUNT";
+    private static final String EXPORT_PATH = ConstVal.PROJECT_PATH.concat("/export/");
 
     /**
      * TODO
@@ -51,23 +64,7 @@ public class TableController {
      */
     @GetMapping("data/tables/{tableId}")
     public ResultVO<List<TableFiled>> table(@PathVariable String tableId) {
-        dbQuery = new DecoratorDbQuery(instance);
-        List<TableFiled> tableFileds = new ArrayList<>();
-        try (PreparedStatement preparedStatement = dbQuery.getConnection().prepareStatement(dbQuery.tableFieldsSql())) {
-            preparedStatement.setString(1, tableId);
-            dbQuery.query(preparedStatement, u -> {
-                tableFileds.add(TableFiled.builder()
-                        .name(u.getStringResult("NAME"))
-                        .type(u.getStringResult("TYPE"))
-                        .length(u.getStringResult("LENGTH"))
-                        .nullAble(u.getStringResult("NULLABLE"))
-                        .comment(u.getStringResult("RESVD5"))
-                        .build());
-            });
-        } catch (SQLException sqlException) {
-            sqlException.printStackTrace();
-        }
-        return new ResultVO<>(tableFileds);
+        return new ResultVO<>(TableService.getTableFiled(tableId));
     }
 
     @PostMapping("opreation/commentOnColumn")
@@ -94,8 +91,7 @@ public class TableController {
         LogsHandler.instance(request).logs("将执行sql语句：{}", sql);
         log.info("将执行sql语句：{}", sql);
         try (PreparedStatement preparedStatement = dbQuery.getConnection().prepareStatement(sql)) {
-            dbQuery.execute(preparedStatement, u ->
-            {
+            dbQuery.execute(preparedStatement, u -> {
                 LogsHandler.instance(request).logs("修改表{}注释为：{}", tableName, comment);
                 log.info("修改表{}注释为：{}", tableName, comment);
             });
@@ -134,13 +130,14 @@ public class TableController {
     }
 
     /**
-    * TODO 测试用 找FEC665FD88的数据
-    * @param  
-    * @return com.dxh.dgenerator.models.ResultVO 
-    * @author xuhong.ding 
-    * @since 2021/11/18 13:40 
-    **/
-    
+     * TODO 测试用 找FEC665FD88的数据
+     *
+     * @param
+     * @return com.dxh.dgenerator.models.ResultVO
+     * @author xuhong.ding
+     * @since 2021/11/18 13:40
+     **/
+
     @GetMapping("data/find")
     public ResultVO find() {
         List<String> list = ListUtil.list(false);
@@ -160,9 +157,9 @@ public class TableController {
             }
             StringBuilder delete = sql.delete(sql.length() - 2, sql.length());
             Object data = TableService.select(sql.toString()).getData();
-            if (data instanceof String){
-               // list.add(u.getTableName());
-            }else {
+            if (data instanceof String) {
+                // list.add(u.getTableName());
+            } else {
                 ArrayList data1 = (ArrayList) data;
                 if (data1.size() > 0) {
                     list.add(u.getTableName());
@@ -175,27 +172,46 @@ public class TableController {
 
 
     /**
-    * TODO 分页sql
-    * @param sql :
-    * @param page :
-    * @param showData :
-    * @return java.lang.String
-    * @author xuhong.ding
-    * @since 2021/11/18 13:40
-    **/
+     * TODO 分页sql
+     *
+     * @param sql      :
+     * @param page     :
+     * @param showData :
+     * @return java.lang.String
+     * @author xuhong.ding
+     * @since 2021/11/18 13:40
+     **/
     private String pageDecorate(String sql, int page, int showData) {
-        return "select * from (select *,rownum ind from (   "
-                .concat(sql)
-                .concat(" )) where ind between ")
-                .concat((page - 1) * showData + 1 + "")
-                .concat(" and ")
-                .concat(page * showData + "");
+        return "select * from (select *,rownum ind from (   ".concat(sql).concat(" )) where ind between ").concat((page - 1) * showData + 1 + "").concat(" and ").concat(page * showData + "");
     }
 
     private String countSelectDecorate(String sql) {
-        return "select count(*) count from ( "
-                .concat(sql)
-                .concat(" )");
+        return "select count(*) count from ( ".concat(sql).concat(" )");
+    }
+
+
+    /**
+     * TODO 以Excel格式导出数据库，返回给前端
+     *
+     * @return
+     * @author xuhong.ding
+     * @since 2022/5/5 10:14
+     **/
+    @GetMapping("data/export/{tableId}")
+    private void exportTables(@PathVariable String tableId, HttpServletResponse response) throws IOException {
+        response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+        response.setCharacterEncoding("utf-8");
+        //如果EXPORT_PATH不存在，则创建
+        FileUtil.mkdir(EXPORT_PATH);
+        String filename = EXPORT_PATH + instance.getSchemaName() + DateUtil.current() + ".xlsx";
+        String encode = URLEncoder.encode(filename, "UTF-8");
+        response.setHeader("Content-disposition", "attachment;filename=" + encode);
+        EasyExcel.write(response.getOutputStream(), ExportTableModel.class)
+                .registerWriteHandler(new LongestMatchColumnWidthStyleStrategy())
+                .registerWriteHandler(new ExcelFillCellMergeStrategy(1, new int[]{0, 1}))
+                .sheet(tableId).doWrite(() -> {
+                    return TableService.getTableDataForDownload(tableId);
+                });
     }
 
 

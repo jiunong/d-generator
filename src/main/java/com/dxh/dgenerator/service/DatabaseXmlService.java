@@ -38,7 +38,7 @@ public class DatabaseXmlService {
 
     private static final Resource resource = new ClassPathResource("database.xml");
 
-    private static final String DATABASE_XML_PATH = System.getProperty("user.dir")+"/conf/database.xml";
+    private static final String DATABASE_XML_PATH = ConstVal.PROJECT_PATH+"conf/database.xml";
 
     public static List<DataSourceParam> getDBs() {
 
