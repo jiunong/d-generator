@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <dbs>
 	<DataSourceParam>
-	    <description>辽宁配网拓扑分析</description>
+	    <description>xxx</description>
 	    <url>jdbc:dm://127.0.0.1:12345/LNPWTPFX?allowMultiQueries=true</url>
 	    <username>LNPWTPFX</username>
 	    <password>LNPWTPFX</password>
