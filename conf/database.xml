@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <dbs>
-	<DataSourceParam>
-	    <description>xxx</description>
-	    <url>jdbc:dm://127.0.0.1:12345/LNPWTPFX?allowMultiQueries=true</url>
-	    <username>LNPWTPFX</username>
-	    <password>LNPWTPFX</password>
-	    <database>LNPWTPFX</database>
-	    <schemaName>LNPWTPFX</schemaName>
-	  </DataSourceParam>
+    <DataSourceParam>
+        <description>XXXX</description>
+        <url>jdbc:dm://127.0.0.1:12345/XXXX?allowMultiQueries=true</url>
+        <database>XX</database>
+        <username>XX</username>
+        <password>XX</password>
+        <schemaName>XX</schemaName>
+    </DataSourceParam>
 </dbs>

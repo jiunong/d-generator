@@ -25,6 +25,7 @@
                         <input type="text" id="table_name" name="table_name" placeholder="请输入表名"/>
                     </th>
                     <th><button onclick="exportDb()">导出数据库</button></th>
+                    <th><button onclick="exportComment()">导出数据库备注</button></th>
                 </tr>
                 </thead>
                 <tbody>

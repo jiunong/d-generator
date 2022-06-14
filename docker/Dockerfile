@@ -5,7 +5,7 @@
 # 基础镜像使用java
 FROM java:8
 
-MAINTAINER xuhong.ding <dingxuhong@sict.ac
+MAINTAINER xuhong.ding <dingxuhong@sict.ac.com>
 
 #系统编码
 ENV LANG=C.UTF-8 LC_ALL=C.UTF-8
@@ -19,4 +19,4 @@ ADD d-generator-0.0.1-SNAPSHOT.jar d-generator.jar
 RUN bash -c 'touch /d-generator'
 ENTRYPOINT ["java","-jar","/d-generator"]
 ###声明启动端口号
-EXPOSE 8080
+EXPOSE 9527

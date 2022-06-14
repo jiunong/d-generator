@@ -26,7 +26,7 @@ public class DMQuery extends AbstractDbQuery {
     @Override
     public String tablesSql() {
         return "SELECT ID,NAME,RESVD5 COMMENT  FROM  DATABASE.SYSDBA.SYSTABLES WHERE TYPE = 'U' AND SCHID=(SELECT SCHID FROM DATABASE.SYSDBA.SYSSCHEMAS WHERE NAME = ? AND ROWNUM = 1) " +
-            "ORDER BY SUBSTR(NAME,0,1) ASC";
+            "ORDER BY NAME ASC";
     }
 
     @Override

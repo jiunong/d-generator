@@ -141,3 +141,6 @@ const sql = function () {
 function exportDb() {
     window.open('/data/export/text')
 }
+function exportComment() {
+    window.open('/comment/export/text')
+}

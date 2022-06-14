@@ -2,6 +2,8 @@ package com.dxh.dgenerator.service;
 
 import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.map.MapUtil;
+import cn.hutool.core.util.StrUtil;
+import com.dxh.dgenerator.config.ConstVal;
 import com.dxh.dgenerator.config.DataSourceConfig;
 import com.dxh.dgenerator.models.ExportTableModel;
 import com.dxh.dgenerator.models.ResultVO;
@@ -16,6 +18,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * TODO
@@ -27,6 +30,8 @@ public class TableService {
 
     private static DataSourceConfig instance = DataSourceConfig.getInstance();
     private static DecoratorDbQuery dbQuery = null;
+    private final static String COMMENT_ON_TABLE = "comment on table TABLE is 'COMMENT';";
+    private final static String COMMENT_ON_COLUMN = "comment on column TABLE.COLUMN is 'COMMENT';";
 
     /**
      * TODO   获取所有table
@@ -41,11 +46,7 @@ public class TableService {
         try (PreparedStatement preparedStatement = dbQuery.getConnection().prepareStatement(dbQuery.tablesSql())) {
             preparedStatement.setString(1, instance.getSchemaName());
             dbQuery.query(preparedStatement, resultSetWrapper -> {
-                tableInfoList.add(TableInfo.builder()
-                        .tableId(resultSetWrapper.getStringResult("ID"))
-                        .tableName(resultSetWrapper.getStringResult("NAME"))
-                        .comment(resultSetWrapper.getStringResult("COMMENT"))
-                        .build());
+                tableInfoList.add(TableInfo.builder().tableId(resultSetWrapper.getStringResult("ID")).tableName(resultSetWrapper.getStringResult("NAME")).comment(resultSetWrapper.getStringResult("COMMENT")).build());
             });
         } catch (SQLException sqlException) {
             sqlException.printStackTrace();
@@ -77,19 +78,32 @@ public class TableService {
         return new ResultVO<>(dataList);
     }
 
+    public static ResultVO update(String sql) {
+        dbQuery = new DecoratorDbQuery(instance);
+        AtomicInteger success = new AtomicInteger();
+        int fail = 0;
+        final boolean[] flag = {true};
+        try (PreparedStatement preparedStatement = dbQuery.getConnection().prepareStatement(sql)) {
+            dbQuery.execute(preparedStatement, u -> {
+                success.getAndIncrement();
+            });
+        } catch (SQLException sqlException) {
+            fail++;
+        }
+        HashMap<String, Object> res = MapUtil.of("success", success.get());
+        res.put("fail", fail);
+        res.put("total", success.get() + fail);
+        res.put("sql", sql);
+        return new ResultVO<>(res);
+    }
+
     public static List<TableFiled> getTableFiled(String tableId) {
         dbQuery = new DecoratorDbQuery(instance);
         List<TableFiled> tableFileds = new ArrayList<>();
         try (PreparedStatement preparedStatement = dbQuery.getConnection().prepareStatement(dbQuery.tableFieldsSql())) {
             preparedStatement.setString(1, tableId);
             dbQuery.query(preparedStatement, u -> {
-                tableFileds.add(TableFiled.builder()
-                        .name(u.getStringResult("NAME"))
-                        .type(u.getStringResult("TYPE"))
-                        .length(u.getStringResult("LENGTH"))
-                        .nullAble(u.getStringResult("NULLABLE"))
-                        .comment(u.getStringResult("RESVD5"))
-                        .build());
+                tableFileds.add(TableFiled.builder().name(u.getStringResult("NAME")).type(u.getStringResult("TYPE")).length(u.getStringResult("LENGTH")).nullAble(u.getStringResult("NULLABLE")).comment(u.getStringResult("RESVD5")).build());
             });
         } catch (SQLException sqlException) {
             sqlException.printStackTrace();
@@ -97,12 +111,12 @@ public class TableService {
         return tableFileds;
     }
 
-    public static List<ExportTableModel> getTableDataForDownload(String tableId){
+    public static List<ExportTableModel> getTableDataForDownload(String tableId) {
         List<ExportTableModel> list = ListUtil.list(false);
         List<TableInfo> tables = getTables();
-        tables.forEach(u->{
+        tables.forEach(u -> {
             List<TableFiled> tableFiled = getTableFiled(u.getTableId());
-            tableFiled.forEach(v->{
+            tableFiled.forEach(v -> {
                 ExportTableModel eto = new ExportTableModel();
                 eto.setTableName(u.getTableName());
                 eto.setTableComment(u.getComment());
@@ -112,6 +126,23 @@ public class TableService {
                 eto.setColumnComment(v.getComment());
                 eto.setNullAble(v.getNullAble());
                 list.add(eto);
+            });
+        });
+        return list;
+    }
+
+    public static List<String> getTableCommentForDownload(String tableId) {
+        List<String> list = ListUtil.list(false);
+        List<TableInfo> tables = getTables();
+        tables.forEach(u -> {
+            if (StrUtil.isNotEmpty(u.getComment())) {
+                list.add(COMMENT_ON_TABLE.replace(ConstVal.TABLE, u.getTableName()).replace(ConstVal.COMMENT, u.getComment()));
+            }
+            List<TableFiled> tableFiled = getTableFiled(u.getTableId());
+            tableFiled.forEach(v -> {
+                if (StrUtil.isNotEmpty(v.getComment())) {
+                    list.add(COMMENT_ON_COLUMN.replace(ConstVal.TABLE, u.getTableName()).replace(ConstVal.COLUMN, v.getName()).replace(ConstVal.COMMENT, v.getComment()));
+                }
             });
         });
         return list;

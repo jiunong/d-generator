@@ -57,7 +57,9 @@ public class DecoratorDbQuery extends AbstractDbQuery {
     public String tablesSql() {
         if (DbType.DM.equals(dbType)) {
             return dbQuery.tablesSql().replace("DATABASE", database);
-        } else {
+        }else if (DbType.MYSQL.equals(dbType)) {
+            return dbQuery.tablesSql().replace("%s", "");
+        }else{
             return dbQuery.tablesSql();
         }
     }

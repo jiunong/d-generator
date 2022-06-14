@@ -37,7 +37,7 @@
                                 <td width="20%"><label>DESCRIPTION</label></td>
                                 <td><label>
                                         <input name="description" type="text"
-                                               value="沈阳配网检修">
+                                               value="XXX XXX">
                                     </label></td>
                             </tr>
                             <tr>

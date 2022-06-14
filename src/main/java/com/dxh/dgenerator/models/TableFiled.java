@@ -24,6 +24,7 @@ public class TableFiled {
     private String length;
     private IColumnType columnType;
     private String comment;
+    private String defaultValue;
 
 
 }

@@ -14,6 +14,9 @@ public interface ConstVal {
 
     String UTF8 = StandardCharsets.UTF_8.name();
 
+    String TABLE = "TABLE";
+    String COLUMN = "COLUMN";
+    String COMMENT = "COMMENT";
 
 
 }

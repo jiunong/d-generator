@@ -3,6 +3,7 @@ package com.dxh.dgenerator.controller;
 import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.io.FileUtil;
+import cn.hutool.core.map.MapUtil;
 import com.alibaba.excel.EasyExcel;
 import com.alibaba.excel.write.merge.LoopMergeStrategy;
 import com.alibaba.excel.write.style.column.LongestMatchColumnWidthStyleStrategy;
@@ -21,15 +22,15 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.File;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 
 /**
@@ -50,6 +51,7 @@ public class TableController {
     private final static String UPDATE = "UPDATE";
     private final static String DELETE = "DELETE";
     private final static String INSERT = "INSERT";
+    private final static String COMMENT = "COMMENT";
     private final static String COUNT = "COUNT";
     private static final String EXPORT_PATH = ConstVal.PROJECT_PATH.concat("/export/");
 
@@ -108,7 +110,7 @@ public class TableController {
     }
 
     @GetMapping("sql/execute")
-    public ResultVO<List> select(String sql, @RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "20") int showData, HttpServletRequest request) {
+    public ResultVO<List> execute(String sql, @RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "20") int showData, HttpServletRequest request) {
         ResultVO vo = null;
         String trimSql = sql.trim();
         if (trimSql.toUpperCase().startsWith(SELECT)) {
@@ -122,9 +124,16 @@ public class TableController {
         } else if (trimSql.toUpperCase().startsWith(INSERT)) {
             vo = null;
         } else if (trimSql.toUpperCase().startsWith(UPDATE)) {
-            vo = null;
+            vo =  TableService.update(sql);
         } else if (trimSql.toUpperCase().startsWith(DELETE)) {
             vo = null;
+        } else if (trimSql.toUpperCase().startsWith(COMMENT)) {
+            List<String> list = ListUtil.list(false);
+            Arrays.stream(sql.split(";")).forEach(u->{
+                TableService.update(u);
+                list.add(u);
+            });
+            vo = new ResultVO<>(list);
         }
         return vo;
     }
@@ -212,6 +221,22 @@ public class TableController {
                 .sheet(tableId).doWrite(() -> {
                     return TableService.getTableDataForDownload(tableId);
                 });
+    }
+
+    @GetMapping("comment/export/{tableId}")
+    private void exportTablesComment(@PathVariable String tableId, HttpServletResponse response) throws IOException {
+        response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+        response.setCharacterEncoding("utf-8");
+        String filename = instance.getSchemaName() + ConstVal.COMMENT + DateUtil.current() + ".sql";
+        File file = FileUtil.file(filename);
+        FileUtil.writeLines(TableService.getTableCommentForDownload(tableId), file, StandardCharsets.UTF_8);
+        String encode = URLEncoder.encode(filename, "UTF-8");
+        response.setHeader("Content-disposition", "attachment;filename=" + encode);
+        //生成文件并返回前端
+        OutputStream outputStream = response.getOutputStream();
+        outputStream.write(FileUtil.readBytes(file));
+        outputStream.flush();
+        outputStream.close();
     }
 
 
