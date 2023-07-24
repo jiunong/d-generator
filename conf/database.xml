@@ -2,10 +2,10 @@
 <dbs>
     <DataSourceParam>
         <description>XXXX</description>
-        <url>jdbc:dm://127.0.0.1:12345/XXXX?allowMultiQueries=true</url>
-        <database>XX</database>
-        <username>XX</username>
-        <password>XX</password>
-        <schemaName>XX</schemaName>
+        <url>jdbc:dm://localhost:12345/OMSPDJX?userUnicode=true</url>
+        <database>OMSPDJX</database>
+        <username>OMSPDJX_AS</username>
+        <password>OMSPDJX_AS</password>
+        <schemaName>OMSPDJX_AS</schemaName>
     </DataSourceParam>
 </dbs>
