@@ -10,6 +10,16 @@
     <script src="js/jquery.js"></script>
     <script src="layer/layer.js"></script>
     <script src="js/init.js"></script>
+    <script type="text/javascript">
+        $(function () {
+            $("#description").bind("input propertychange", function (event) {
+                console.log($(this).val());
+                $.get("/search/" + $(this).val(), {}, function (res) {
+                    console.log(res)
+                })
+            });
+        });
+    </script>
 </head>
 <body class="body-bg">
 <div id="root" class="root container-fluid">
@@ -36,7 +46,7 @@
                             <tr>
                                 <td width="20%"><label>DESCRIPTION</label></td>
                                 <td><label>
-                                        <input name="description" type="text"
+                                        <input name="description" type="text" id="description"
                                                value="XXX XXX">
                                     </label></td>
                             </tr>
@@ -76,9 +86,9 @@
                                         <button id="_confirm" type="submit" class="but">确定连接<span></span></button>
                                     </label></td>
                                 <td><label>
-<#--
-                                        <button id="_modify" onclick="modifyDb()" type="button" class="but">更新配置<span></span></button>
--->
+                                        <#--
+                                                                                <button id="_modify" onclick="modifyDb()" type="button" class="but">更新配置<span></span></button>
+                                        -->
                                     </label></td>
                             </tr>
                             </tbody>

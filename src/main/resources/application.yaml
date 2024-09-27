@@ -12,11 +12,31 @@ spring:
     expose-session-attributes: on
     request-context-attribute: request
     check-template-location: true
-
+  servlet:
+    multipart:
+      max-file-size: 1024MB
+  thymeleaf:
+    cache: false
+    prefix: classpath:/templates/
+    suffix: .html
+    encoding: UTF-8
+    mode: HTML5
+    servlet:
+      content-type: text/html
+  #配置静态资源
+  mvc:
+    static-path-pattern: /**
+  resource:
+    static-locations: classpath:/static/
 
 ## modify
 database:
   export:
     filePath:
-
-
+sict-search:
+  host: 192.168.139.4
+  scheme: http
+  port: 9200
+  app-info:
+    app-id: d-gen
+    app-name: 测试

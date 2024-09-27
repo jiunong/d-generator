@@ -128,3 +128,9 @@ button {
     box-sizing: border-box;
     box-shadow: 1px 1px 1px #b94842;
 }
+.diff_textarea{
+    height: 50vh;
+    width: 48vw;
+    padding: 10px;
+    margin: 5px 10px  ;
+}

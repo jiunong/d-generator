@@ -4,8 +4,8 @@
         <description>XXXX</description>
         <url>jdbc:dm://localhost:12345/OMSPDJX?userUnicode=true</url>
         <database>OMSPDJX</database>
-        <username>OMSPDJX_AS</username>
-        <password>OMSPDJX_AS</password>
-        <schemaName>OMSPDJX_AS</schemaName>
+        <username>OMSPDJX_AS_PLUS</username>
+        <password>OMSPDJX_AS_PLUS</password>
+        <schemaName>OMSPDJX_AS_PLUS</schemaName>
     </DataSourceParam>
 </dbs>
